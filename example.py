@@ -1,34 +1,28 @@
 from torch_rl.utils import set_seed, linear_schedule
-from torch_rl.env import make_gym_env
+from torch_rl.envs import make_gym_env
 from torch_rl.algo.dqn import QMLPNetwork
 from torch_rl.buffers import ReplayBuffer
 
 import argparse
 from distutils.util import strtobool
 
-# import os
 import random
 import time
 
 import gym
-# import numpy as np
+import numpy as np
 import torch
-# import torch.nn as nn
-# import torch.nn.functional as F
+import torch.nn.functional as F
 import torch.optim as optim
-# from stable_baselines3.common.buffers import ReplayBuffer
 from torch.utils.tensorboard import SummaryWriter
 
 
 def main():
     parser = argparse.ArgumentParser()
-    # parser.add_argument("--exp-name", type=str, default=os.path.basename(__file__).rstrip(".py"),
-        # help="the name of this experiment")
     parser.add_argument("--seed", type=int, default=1,
         help="seed of the experiment")
     parser.add_argument("--cuda", type=lambda x: bool(strtobool(x)), default=True, nargs="?", const=True,
         help="if toggled, cuda will be enabled by default")
-
     parser.add_argument("--env-id", type=str, default="CartPole-v1",
         help="the id of the environment")
     parser.add_argument("--total-timesteps", type=int, default=500000,
@@ -55,9 +49,9 @@ def main():
         help="the frequency of training")
     args = parser.parse_args()
 
-
+    log_path = ".logs"
     run_name = f"{args.env_id}__dqn__{args.seed}__{int(time.time())}"
-    writer = SummaryWriter(f"runs/{run_name}")
+    writer = SummaryWriter(f"{log_path}/runs/{run_name}")
     writer.add_text(
         "hyperparameters",
         "|param|value|\n|-|-|\n%s" % ("\n".join([f"|{key}|{value}|" for key, value in vars(args).items()])),
@@ -66,7 +60,7 @@ def main():
     set_seed(seed=args.seed, deterministic=True)
     device = torch.device("cuda" if torch.cuda.is_available() and args.cuda else "cpu")
 
-    envs = gym.vector.SyncVectorEnv([make_gym_env(args.env_id, args.seed, 0, args.capture_video, run_name)])
+    envs = gym.vector.SyncVectorEnv([make_gym_env(args.env_id, args.seed, 0, f"{log_path}/videos/{run_name}")])
     assert isinstance(envs.single_action_space, gym.spaces.Discrete), "only discrete action space is supported"
 
     q_network = QMLPNetwork(envs).to(device)
@@ -78,15 +72,12 @@ def main():
         args.buffer_size,
         envs.single_observation_space,
         envs.single_action_space,
-        device,
-        handle_timeout_termination=True,
+        device
     )
     start_time = time.time()
 
-    # TRY NOT TO MODIFY: start the game
     obs = envs.reset()
     for global_step in range(args.total_timesteps):
-        # ALGO LOGIC: put action logic here
         epsilon = linear_schedule(args.start_e, args.end_e, args.exploration_fraction * args.total_timesteps, global_step)
         if random.random() < epsilon:
             actions = np.array([envs.single_action_space.sample() for _ in range(envs.num_envs)])
@@ -106,10 +97,10 @@ def main():
 
         real_next_obs = next_obs.copy()
         for idx, d in enumerate(dones):
-            if d:
+            if d and "terminal_observation" in infos[idx].keys():
                 real_next_obs[idx] = infos[idx]["terminal_observation"]
-        rb.add(obs, real_next_obs, actions, rewards, dones, infos)
-
+        
+        rb.add(obs, real_next_obs, actions, rewards, dones)
         obs = next_obs
 
         if global_step > args.learning_starts and global_step % args.train_frequency == 0:
@@ -126,12 +117,10 @@ def main():
                 print("SPS:", int(global_step / (time.time() - start_time)))
                 writer.add_scalar("charts/SPS", int(global_step / (time.time() - start_time)), global_step)
 
-            # optimize the model
             optimizer.zero_grad()
             loss.backward()
             optimizer.step()
 
-            # update the target network
             if global_step % args.target_network_frequency == 0:
                 target_network.load_state_dict(q_network.state_dict())
 
@@ -140,4 +129,5 @@ def main():
 
 
 if __name__ == "__main__":
+    # xvfb-run -s "-screen 0 1400x900x24" python example.py --env-id CartPole-v1
     main()
