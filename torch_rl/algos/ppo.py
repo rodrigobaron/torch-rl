@@ -107,7 +107,7 @@ class DiscretePPO():
         next_done = torch.zeros(args.num_envs).to(device)
         num_updates = args.total_timesteps // args.batch_size
 
-        pbar = tqdm.trange(training_args.total_timesteps, desc="DiscretePPO training", unit="batch")
+        pbar = tqdm.trange(num_updates, desc="DiscretePPO training", unit="batch")
         for batch_idx in pbar:
             update = batch_idx + 1
             if args.anneal_lr:
@@ -132,7 +132,6 @@ class DiscretePPO():
 
                 for idx, d in enumerate(done):
                     if d and info["lives"][idx] == 0:
-                        # print(f"global_step={global_step}, episodic_return={info['r'][idx]}")
                         avg_returns.append(info["r"][idx])
                         writer.add_scalar("charts/avg_episodic_return", np.average(avg_returns), global_step)
                         writer.add_scalar("charts/episodic_return", info["r"][idx], global_step)
@@ -235,7 +234,6 @@ class DiscretePPO():
             writer.add_scalar("losses/approx_kl", approx_kl.item(), global_step)
             writer.add_scalar("losses/clipfrac", np.mean(clipfracs), global_step)
             writer.add_scalar("losses/explained_variance", explained_var, global_step)
-            # print("SPS:", int(global_step / (time.time() - start_time)))
             writer.add_scalar("charts/SPS", int(global_step / (time.time() - start_time)), global_step)
 
         envs.close()
