@@ -67,15 +67,10 @@ class DiscretePPOModel(nn.Module):
         return action, probs.log_prob(action), probs.entropy(), self.critic(hidden)
 
 
-def build_optim(params, optim_args):
-    optim_build_args = optim_args.copy()
-    optim = optim_build_args.pop('optim')
-    
-    return optim(params, **optim_build_args)
-
 class DiscretePPO():
-    def __init__(self, encoder, optim_args):
+    def __init__(self, encoder, optim, optim_args):
         self.encoder = encoder
+        self.optim_func = optim
         self.optim_args = optim_args
 
         self.agent = None
@@ -83,7 +78,7 @@ class DiscretePPO():
     
     def initialize(self, env, device):
         self.agent = DiscretePPOModel(env, self.encoder).to(device)
-        self.optimizer = build_optim(self.agent.parameters(), self.optim_args)
+        self.optimizer = self.optim_func(self.agent.parameters(), **self.optim_args)
     
     def train(self, env, device, training_args, writer):
         assert isinstance(env.action_space, gym.spaces.Discrete), "only discrete action space is supported"

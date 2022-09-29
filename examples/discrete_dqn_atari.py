@@ -73,6 +73,12 @@ if __name__ == "__main__":
         [make_gym_env(args.env_id, args.seed, 0, record_path)]
     )
 
+    scheduler = LinearSchedule(
+        args.start_e, 
+        args.end_e, 
+        args.exploration_fraction * args.total_timesteps
+    )
+
     rb = ReplayBuffer(
         args.buffer_size,
         envs.single_observation_space,
@@ -82,10 +88,11 @@ if __name__ == "__main__":
 
     dqn = DiscreteDQN(
         encoder=mlp_encoder(envs.single_observation_space.shape),
-        optim_args = {
-            'optim': optim.Adam,
-            'lr': args.learning_rate
-        },
+        optim= optim.Adam,
+        optim_args = dict(
+            lr = args.learning_rate
+        ),
+        scheduler = scheduler,
         buffer = rb
     )
 
@@ -97,18 +104,11 @@ if __name__ == "__main__":
         batch_size = args.batch_size,
         gamma = args.gamma
     )
-    
-    scheduler = LinearSchedule(
-        args.start_e, 
-        args.end_e, 
-        args.exploration_fraction * args.total_timesteps
-    )
 
     dqn.train(
         env=envs, 
         device=device,
         training_args = training_args,
-        scheduler = scheduler,
         writer = writer
     )
 

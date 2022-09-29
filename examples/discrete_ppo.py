@@ -147,11 +147,11 @@ if __name__ == "__main__":
     
     ppo = DiscretePPO(
         encoder=conv_encoder(envs.single_observation_space.shape),
-        optim_args = {
-            'optim': optim.Adam,
-            'lr': args.learning_rate,
-            'eps': 1e-5
-        },
+        optim= optim.Adam,
+        optim_args = dict(
+            lr = args.learning_rate,
+            eps = 1e-5
+        ),
     )
 
     training_args = PPOTrainingArgs(

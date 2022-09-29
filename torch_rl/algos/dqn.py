@@ -34,32 +34,28 @@ class DiscreteDQNModel(nn.Module):
         return self.network(x)
 
 
-def build_optim(params, optim_args):
-    optim_build_args = optim_args.copy()
-    optim = optim_build_args.pop('optim')
-    
-    return optim(params, **optim_build_args)
-
-
 class DiscreteDQN():
-    def __init__(self, encoder, optim_args, buffer):
+    def __init__(self, encoder, optim, optim_args, scheduler, buffer):
         self.encoder = encoder
+        self.optim_func = optim
         self.optim_args = optim_args
+        self.scheduler = scheduler
         self.buffer = buffer
 
         self.q_network = None
         self.target_network = None
         self.optimizer = None
-    
+
+
     def initialize(self, env, device):
         self.q_network = DiscreteDQNModel(env, self.encoder).to(device)
 
         self.target_network = DiscreteDQNModel(env, self.encoder).to(device)
         self.target_network.load_state_dict(self.q_network.state_dict())
 
-        self.optimizer = build_optim(self.q_network.parameters(), self.optim_args)
+        self.optimizer = self.optim_func(self.q_network.parameters(), **self.optim_args)
     
-    def train(self, env, device, training_args, scheduler, writer):
+    def train(self, env, device, training_args, writer):
         assert isinstance(env.single_action_space, gym.spaces.Discrete), "only discrete action space is supported"
 
         self.initialize(env, device)
@@ -68,7 +64,7 @@ class DiscreteDQN():
         obs = env.reset()
         pbar = tqdm.trange(training_args.total_timesteps, desc="DiscreteDQN training", unit="step")
         for global_step in pbar:
-            epsilon = scheduler(global_step)
+            epsilon = self.scheduler(global_step)
             if random.random() < epsilon:
                 actions = np.array([env.single_action_space.sample() for _ in range(env.num_envs)])
             else:
