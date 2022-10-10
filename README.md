@@ -1,6 +1,6 @@
 # torch-rl
 
-TorchRL is a Deep Reinformcement Learning (RL), Offiline RL, Imitation Learning and Multi Agent RL algorithms re-implementation using pytorch as simple and standalone python notebooks.
+TorchRL is a Deep Reinforcement Learning (RL), Offiline RL, Imitation Learning and Multi Agent RL algorithms re-implementation using pytorch as simple and standalone python notebooks.
 
 ## Algorithms
 
