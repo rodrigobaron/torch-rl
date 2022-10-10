@@ -9,7 +9,7 @@ List of implemented algorithms
 | Algorithm      | Implemented |
 | ----------- | ----------- |
 | [Proximal Policy Gradient (PPO)](https://arxiv.org/pdf/1707.06347.pdf)  |  [`ppo_atari.ipynb`](notebooks/ppo_atari.ipynb) |
-| [Deep Q-Learning (DQN)](https://web.stanford.edu/class/psych209/Readings/MnihEtAlHassibis15NatureControlDeepRL.pdf) |  [`dqn.ipynb`](notebooks/dqn.ipynb),  
+| [Deep Q-Learning (DQN)](https://web.stanford.edu/class/psych209/Readings/MnihEtAlHassibis15NatureControlDeepRL.pdf) |  [`dqn.ipynb`](notebooks/dqn.ipynb) |
 
 :TODO:
 
@@ -20,7 +20,6 @@ List of environments used.
 ### Atari
 
 <div align='center'>
-  Atari ENV
   <img alt="Playing on Asterix, Boxing, Breakout, Demon Attack, Freeway, Gopher, Kung Fu Master, Pong" src="assets/atari.gif">
 </div>
 
