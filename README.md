@@ -6,7 +6,7 @@ TorchRL is a Deep Reinformcement Learning (RL), Offiline RL, Imitation Learning 
 
 List of implemented algorithms
 
-| Algorithm      | Implemented |
+| Algorithm      | Notebook |
 | ----------- | ----------- |
 | [Proximal Policy Gradient (PPO)](https://arxiv.org/pdf/1707.06347.pdf)  |  [`ppo_atari.ipynb`](notebooks/ppo_atari.ipynb) |
 | [Deep Q-Learning (DQN)](https://web.stanford.edu/class/psych209/Readings/MnihEtAlHassibis15NatureControlDeepRL.pdf) |  [`dqn.ipynb`](notebooks/dqn.ipynb) |
