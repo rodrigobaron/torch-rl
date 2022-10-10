@@ -1,6 +1,0 @@
-artifact_location: file:///app/notebooks/mlruns/1
-creation_time: 1665005526433
-experiment_id: '1'
-last_update_time: 1665005526433
-lifecycle_stage: active
-name: dqn
