@@ -25,6 +25,10 @@ List of environments used.
 
 :TODO:
 
+## Dev Setup
+
+The development docker uses [torch-jupyter](https://github.com/rodrigobaron/torch-jupyter) as base image so running [docker-buid](docker-build.sh) and [docker-run](docker-run.sh) will setup everything.
+
 ## License
 
 [MIT License](LICENSE)

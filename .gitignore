@@ -130,3 +130,4 @@ dmypy.json
 
 .virtual_documents/
 .logs
+notebooks/videos

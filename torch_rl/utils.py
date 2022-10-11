@@ -1,11 +1,16 @@
+import os
+import sys
+import time
+
 import numpy as np
 import torch
 import random
 import pandas as pd
 
 import imageio
-import os, sys
+
 from collections import defaultdict
+from datetime import timedelta
 
 
 def seed_everything(seed, deterministic=True):
@@ -54,3 +59,43 @@ def mp4_to_gif(mp4_path, gif_path):
     print("\r\nFinalizing...")
     writer.close()
     print("Done.")
+
+
+def get_time_hh_mm_ss(sec):
+    td_str = str(timedelta(seconds=sec))
+    x = td_str.split(':')
+    return_str = []
+    if int(x[0]) > 0:
+        return_str.append(f"{x[0]} hour(s)")
+    if int(x[1]) > 0 or int(x[0]) > 0:
+        return_str.append(f"{x[1]} minute(s)")
+    return_str.append(f"{x[2]} second(s)")
+
+    return ", ".join(return_str)
+
+
+class SPS:
+    def __init__(self, total_steps, start_time=None):
+        self._total_steps = total_steps
+        self._start_time = start_time if start_time is not None else time.time()
+        self._current_step = 0
+        self._current_value = -1
+
+    def get_total_steps(self):
+        return self._total_steps
+
+    def get_curent_value(self):
+        return self._current_value
+
+    def step(self, current_step, current_time=None):
+        current_time = current_time if current_time is not None else time.time()
+        self._current_step = current_step
+        self._current_value = int(current_step / (current_time - self._start_time))
+
+    def get_perc(self):
+        current_step = self._total_steps if self._current_step + 1 >= self._total_steps else self._current_step
+        return int(current_step / self._total_steps * 100)
+
+    def get_remaining_seconds(self):
+        return int(((self._total_steps - self._current_step) / self._current_value))
+
