@@ -101,7 +101,10 @@ def plot_metrics_notebook(ms, metrics, colors=None, sps=None, fontsize=12, clear
     m = 0
     for i in range(nrows):
         for j in range(ncols):
-            _plot(axs[i][j], metrics[m], colors[m])
+            if nrows > 1:
+                _plot(axs[i][j], metrics[m], colors[m])
+            else:
+                _plot(axs[j], metrics[m], colors[m])
             m += 1
 
     plt.tight_layout()
