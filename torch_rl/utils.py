@@ -65,9 +65,9 @@ def get_time_hh_mm_ss(sec):
     td_str = str(timedelta(seconds=sec))
     x = td_str.split(':')
     return_str = []
-    if int(x[0]) > 0:
+    if int(x[0].split(' ')[0]) > 0:
         return_str.append(f"{x[0]} hour(s)")
-    if int(x[1]) > 0 or int(x[0]) > 0:
+    if int(x[1]) > 0 or int(x[0].split(' ')[0]) > 0:
         return_str.append(f"{x[1]} minute(s)")
     return_str.append(f"{x[2]} second(s)")
 
